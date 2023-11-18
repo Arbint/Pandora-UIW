@@ -1,0 +1,9 @@
+src_dir: E:\dev\Pandora-UIW\src
+root_dir: E:\dev\Pandora-UIW
+dependency_path: E:\dev\Pandora-UIW\vendor\pythonEnv
+pandora_script_dir: E:\dev\Pandora-UIW\vendor\Pandora\Pandora\Scripts
+lib_dir: E:\dev\Pandora-UIW\vendor\pythonEnv\PythonLibs\Python37
+win32_lib_root_dir: E:\dev\Pandora-UIW\vendor\pythonEnv\PythonLibs\Python37\win32
+win32_lib_dir: E:\dev\Pandora-UIW\vendor\pythonEnv\PythonLibs\Python37\win32\lib
+pyside_lib_dir: E:\dev\Pandora-UIW\vendor\pythonEnv\PythonLibs\Python37\PySide
+pandora_interface_lib_dir: E:\dev\Pandora-UIW\vendor\Pandora\Pandora\Scripts\UserInterfacesPandora
