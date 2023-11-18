@@ -133,7 +133,7 @@ class PandoraInstallerWidget(QWidget):
         installer.install()
 
 if __name__ == "__main__":
-    qApp = QApplication(sys.argv)
+    qApp = QApplication()
     qApp.setStyleSheet(qdarkstyle.load_stylesheet(pyside=True))
 
     widget = PandoraInstallerWidget()
