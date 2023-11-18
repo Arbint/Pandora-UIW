@@ -1,16 +1,39 @@
+#setup lib path
+import os, shutil, sys, platform
+
+if sys.version[0] == "3":
+    pVersion = 3
+    pyLibs = "Python37"
+else:
+    pVersion = 2
+    pyLibs = "Python27"
+
+root_path = os.path.abspath(os.path.dirname(os.path.dirname(__file__)))
+
+script_path = os.path.abspath(os.path.dirname(__file__))
+if script_path not in sys.path:
+    sys.path.append(script_path)
+
+sys.path.insert(0, os.path.join(root_path, "dependency\\PythonLibs", pyLibs))
+sys.path.insert(0, os.path.join(root_path, "dependency\\PythonLibs", pyLibs, "win32"))
+sys.path.insert(0, os.path.join(root_path, "dependency\\PythonLibs", pyLibs, "win32", "lib"))
+sys.path.insert(0, os.path.join(root_path, "dependency\\PythonLibs", pyLibs, "PySide"))
+
+sys.path.insert(0, os.path.join(root_path, "vendor\\Pandora\\Pandora\\Scripts", "UserInterfacesPandora"))
+sys.path.insert(0, os.path.join(root_path, "vendor\\Pandora\\Pandora\\Scripts"))
+
+os.environ['PATH'] = os.path.join(root_path, "dependency\\PythonLibs", pyLibs, "pywin32_system32") + os.pathsep + os.environ['PATH']
+
+#importing modules
 import os.path
 import sys
-import subprocess
 import shutil
 
 from PySide2.QtCore import QStandardPaths
-from PySide2.QtWidgets import QApplication, QMainWindow, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QFileDialog, QLineEdit, QLabel
-from PySide2 import QtCore
+from PySide2.QtWidgets import QApplication, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QFileDialog, QLineEdit, QLabel
 
 #pandora facilities
 from UserInterfacesPandora import qdarkstyle
-from Pandora_Maya_Integration import Pandora_Maya_Integration
-from PandoraSettings import PandoraSettings
 from PandoraCore import PandoraCore
 
 class PandoraInstallerWidget(QWidget):
@@ -110,8 +133,10 @@ class PandoraInstallerWidget(QWidget):
         installer.install()
 
 if __name__ == "__main__":
-    app = QApplication([])
+    qApp = QApplication(sys.argv)
+    qApp.setStyleSheet(qdarkstyle.load_stylesheet(pyside=True))
+
     widget = PandoraInstallerWidget()
     widget.show()
-    app.exec_()
 
+    sys.exit(qApp.exec_())
