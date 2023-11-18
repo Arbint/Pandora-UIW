@@ -84,12 +84,12 @@ class PandoraInstallerWidget(QWidget):
                 shutil.copytree(dependency_path, destination)
 
 
-        subprocess.run([pandora_installer_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
+        #subprocess.run([pandora_installer_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 
         os.chdir(pandora_installer_dir)
         #init pandora core
         core = PandoraCore()
-
+        self.installPandora(core)
         #setup maya integration
         core_working_dir = os.path.join(pandora_installer_dir, 'Pandora\\Scripts')
         os.chdir(core_working_dir)
