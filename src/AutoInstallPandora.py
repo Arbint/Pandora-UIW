@@ -60,6 +60,7 @@ init_sys_path()
 
 # Pyside
 from PySide2.QtCore import QStandardPaths
+from PySide2.QtGui import QIcon
 from PySide2.QtWidgets import QApplication, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QFileDialog, QLineEdit, QLabel, QFrame
 
 # pandora facilities
@@ -277,6 +278,13 @@ class PandoraInstallerWidget(QWidget):
 
 qApp = QApplication()
 qApp.setStyleSheet(qdarkstyle.load_stylesheet(pyside=True))
+
+#icon setup
+exec_dir = os.path.dirname(os.path.abspath(__file__))
+project_dir = os.path.dirname(os.path.abspath(exec_dir))
+icon_path =project_dir + "\\assets\\icon.ico"
+handlerIcon = QIcon(icon_path)
+qApp.setWindowIcon(handlerIcon)
 
 widget = PandoraInstallerWidget()
 widget.show()
