@@ -80,7 +80,7 @@ class PandoraInstallerWidget(QWidget):
         self.maya_path_field = QLineEdit()
         self.load_path_button = QPushButton("...")
 
-        self.net_path_hint = QLabel("Net Location should be a net location all render slaves can access (example: \\\\AD-406\\render_server\\)")
+        self.net_path_hint = QLabel("Net Location should be a net location all render slaves and the coordinator can access (example: \\\\AD-406\\render_server\\)")
         self.net_path_label = QLabel("Net Location: ")
         self.net_path_field = QLineEdit()
         self.net_path_button = QPushButton("...")
