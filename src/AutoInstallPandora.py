@@ -1,4 +1,5 @@
 # setup lib path
+import json
 import os
 import shutil
 import sys
@@ -77,19 +78,19 @@ class PandoraInstallerWidget(QWidget):
         self.maya_path_field = QLineEdit()
         self.load_path_button = QPushButton("...")
 
-        self.net_path_hint = QLabel("Net Location should be a net location all render slaves and the master can access (example: \\\\AD-406\\render_server\\)")
+        self.net_path_hint = QLabel("Net Location should be a net location all render slaves can access (example: \\\\AD-406\\render_server\\)")
         self.net_path_label = QLabel("Net Location: ")
         self.net_path_field = QLineEdit()
         self.net_path_button = QPushButton("...")
 
-        self.local_repo_path_hint = QLabel("Local repository need to be unique for every render slave and the master(can be a net location, faster if local)")
+        self.local_repo_path_hint = QLabel("Local repository need to be unique for every render slave(can be a net location, faster if local)")
         self.local_repo_path_label = QLabel("Local Repository: ")
         self.local_repo_path_field = QLineEdit()
         self.local_repo_path_button = QPushButton("...")
 
         self.install_button = QPushButton("Install")
         self.setup_slave_button = QPushButton("Start Slave")
-        self.setup_master_button = QPushButton("Start Master")
+        self.open_settings_button = QPushButton("Pandora Settings")
         # layout
         self.layout = QVBoxLayout(self)
         frame = QFrame(self)
@@ -134,8 +135,8 @@ class PandoraInstallerWidget(QWidget):
         frame.setFrameShadow(QFrame.Sunken)
         self.layout.addWidget(frame)
         self.layout.addWidget(self.install_button)
-        self.layout.addWidget(self.setup_master_button)
         self.layout.addWidget(self.setup_slave_button)
+        self.layout.addWidget(self.open_settings_button)
 
         # deault values:
         self.documents_path = QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation)
@@ -147,30 +148,60 @@ class PandoraInstallerWidget(QWidget):
         self.install_button.clicked.connect(self.install)
         self.net_path_button.clicked.connect(self.pick_net_path)
         self.local_repo_path_button.clicked.connect(self.pick_local_repo_path)
-        self.setup_slave_button.clicked.connect(self.setup_slave)
-        self.setup_master_button.clicked.connect(self.setup_master)
+        self.setup_slave_button.clicked.connect(self.toggle_slave)
+        self.open_settings_button.clicked.connect(self.open_pandora_settings)
 
         # style
         self.resize(600, 100)
         self.setStyleSheet(qdarkstyle.load_stylesheet(pyside=True))
 
+        self.config_file_name = "config.json"
+        self.load_config()
+
     def load_config(self):
-        pass
+        exec_dir = os.path.dirname(os.path.abspath(__file__))
+        config_file_path = os.path.join(exec_dir, self.config_file_name)
+
+        with open(config_file_path, "r") as config_file:
+            config_data = json.load(config_file)
+            self.local_repo_path_field.setText(config_data["localRepository"])
+            self.net_path_field.setText(config_data["netLocation"])
 
     def save_settings(self):
-        pass
+        exec_dir = os.path.dirname(os.path.abspath(__file__))
+        config_file_path = os.path.join(exec_dir, self.config_file_name)
+        config = {
+            "netLocation": self.net_path_field.text(),
+            "localRepository": self.local_repo_path_field.text()
+        }
+        config_json = json.dumps(config, indent=4)
+
+        with open(config_file_path, "w") as config_file:
+            config_file.write(config_json)
 
     def pick_local_repo_path(self):
-        print("picking local repo path")
+        self.pick_path_for_field(self.local_repo_path_field)
 
     def pick_net_path(self):
-        print("picking net path")
+        self.pick_path_for_field(self.net_path_field)
 
-    def setup_slave(self):
-        print("setting up slave")
+    def toggle_slave(self):
+        exec_dir = os.path.dirname(os.path.abspath(__file__))
+        project_dir = os.path.dirname(os.path.abspath(exec_dir))
+        pandora_slave_path = os.path.join(project_dir, "vendor\\Pandora\\Pandora\\Python37\\Pandora Slave.exe")
+        pandora_slave_file_path = os.path.join(project_dir, "vendor\\Pandora\\Pandora\\Scripts\\PandoraSlave.py")
 
-    def setup_master(self):
-        print("setting up master")
+        import subprocess
+        subprocess.Popen([pandora_slave_path, pandora_slave_file_path])
+
+    def open_pandora_settings(self):
+        exec_dir = os.path.dirname(os.path.abspath(__file__))
+        project_dir = os.path.dirname(os.path.abspath(exec_dir))
+        pandora_settings_path = os.path.join(project_dir, "vendor\\Pandora\\Pandora\\Python37\\Pandora Settings.exe")
+        pandora_settings_file_path = os.path.join(project_dir, "vendor\\Pandora\\Pandora\\Scripts\\PandoraSettings.py")
+
+        import subprocess
+        subprocess.Popen([pandora_settings_path, pandora_settings_file_path])
 
     def pick_maya_path(self):
         self.documents_path = self.pick_path_for_field(self.maya_path_field)
@@ -209,7 +240,7 @@ class PandoraInstallerWidget(QWidget):
         self.setupMayaPlugins(core)
         self.setupLocalPath(core)
         self.setupRootPath(core)
-
+        self.save_settings()
     def setupLocalPath(self, core: PandoraCore):
         configureData = []
 
