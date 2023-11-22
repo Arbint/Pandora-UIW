@@ -3,6 +3,7 @@ import os
 import shutil
 import sys
 
+
 def init_sys_path():
     py_libs = "Python37"
     vendor_dir_name = 'vendor'
@@ -20,8 +21,7 @@ def init_sys_path():
     dependency_path = os.path.join(root_dir, vendor_dir_name, 'pythonEnv')
     pandora_script_dir = os.path.join(root_dir, vendor_dir_name, pandora_dir_name, pandora_scrip_relative_dir)
 
-
-    #add lib paths
+    # add lib paths
     sys.path.insert(0, pandora_script_dir)
 
     lib_dir = os.path.join(dependency_path, "PythonLibs", py_libs)
@@ -41,8 +41,8 @@ def init_sys_path():
 
     os.environ['PATH'] = os.path.join(dependency_path, "PythonLibs", py_libs, "pywin32_system32") + os.pathsep + os.environ['PATH']
 
-    #log out path info:
-    #sys.stdout = open('output.log', 'w')
+    # log out path info:
+    # sys.stdout = open('output.log', 'w')
     print(f"src_dir: {src_dir}")
     print(f"root_dir: {root_dir}")
     print(f"dependency_path: {dependency_path}")
@@ -51,15 +51,15 @@ def init_sys_path():
     print(f"win32_lib_root_dir: {win32_lib_root_dir}")
     print(f"win32_lib_dir: {win32_lib_dir}")
     print(f"pyside_lib_dir: {pyside_lib_dir}")
-    print(f"pandora_interface_lib_dir: {pandora_interface_lib_dir}")
-    #sys.stdout.close()
+    print(f"pandora_interface_lib_dir: {pandora_interface_lib_dir}")  # sys.stdout.close()
 
-#needed for python interactive interpreter to load modules properly.
+
+# needed for python interactive interpreter to load modules properly.
 init_sys_path()
 
-#Pyside
+# Pyside
 from PySide2.QtCore import QStandardPaths
-from PySide2.QtWidgets import QApplication, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QFileDialog, QLineEdit, QLabel
+from PySide2.QtWidgets import QApplication, QPushButton, QVBoxLayout, QHBoxLayout, QWidget, QFileDialog, QLineEdit, QLabel, QFrame
 
 # pandora facilities
 from UserInterfacesPandora import qdarkstyle
@@ -72,25 +72,70 @@ class PandoraInstallerWidget(QWidget):
         self.setWindowTitle("UIW Pandora Auto Installer 0.0.1")
 
         # Widgets
-        self.maya_path_hint = QLabel(
-            "Maya Document Path should be C:\\Users\\your_user_name\\Documents\\maya\\maya_version")
+        self.maya_path_hint = QLabel("Maya Document Path should be C:\\Users\\your_user_name\\Documents\\maya\\maya_version")
         self.maya_path_label = QLabel("Maya Document Path: ")
         self.maya_path_field = QLineEdit()
         self.load_path_button = QPushButton("...")
-        self.install_button = QPushButton("Install")
 
+        self.net_path_hint = QLabel("Net Location should be a net location all render slaves and the master can access (example: \\\\AD-406\\render_server\\)")
+        self.net_path_label = QLabel("Net Location: ")
+        self.net_path_field = QLineEdit()
+        self.net_path_button = QPushButton("...")
+
+        self.local_repo_path_hint = QLabel("Local repository need to be unique for every render slave and the master(can be a net location, faster if local)")
+        self.local_repo_path_label = QLabel("Local Repository: ")
+        self.local_repo_path_field = QLineEdit()
+        self.local_repo_path_button = QPushButton("...")
+
+        self.install_button = QPushButton("Install")
+        self.setup_slave_button = QPushButton("Start Slave")
+        self.setup_master_button = QPushButton("Start Master")
         # layout
         self.layout = QVBoxLayout(self)
-        self.path_layout = QHBoxLayout(self)
+        frame = QFrame(self)
+        frame.setFrameShape(QFrame.HLine)
+        frame.setFrameShadow(QFrame.Sunken)
+        self.layout.addWidget(frame)
+        self.maya_path_layout = QHBoxLayout(self)
 
         self.layout.addWidget(self.maya_path_hint)
 
-        self.layout.addLayout(self.path_layout)
-        self.path_layout.addWidget(self.maya_path_label)
-        self.path_layout.addWidget(self.maya_path_field)
-        self.path_layout.addWidget(self.load_path_button)
+        self.layout.addLayout(self.maya_path_layout)
+        self.maya_path_layout.addWidget(self.maya_path_label)
+        self.maya_path_layout.addWidget(self.maya_path_field)
+        self.maya_path_layout.addWidget(self.load_path_button)
 
+        frame = QFrame(self)
+        frame.setFrameShape(QFrame.HLine)
+        frame.setFrameShadow(QFrame.Sunken)
+        self.layout.addWidget(frame)
+        self.layout.addWidget(self.net_path_hint)
+
+        self.net_path_layout = QHBoxLayout(self)
+        self.layout.addLayout(self.net_path_layout)
+        self.net_path_layout.addWidget(self.net_path_label)
+        self.net_path_layout.addWidget(self.net_path_field)
+        self.net_path_layout.addWidget(self.net_path_button)
+
+        frame = QFrame(self)
+        frame.setFrameShape(QFrame.HLine)
+        frame.setFrameShadow(QFrame.Sunken)
+        self.layout.addWidget(frame)
+        self.layout.addWidget(self.local_repo_path_hint)
+
+        self.local_repo_path_layout = QHBoxLayout(self)
+        self.layout.addLayout(self.local_repo_path_layout)
+        self.local_repo_path_layout.addWidget(self.local_repo_path_label)
+        self.local_repo_path_layout.addWidget(self.local_repo_path_field)
+        self.local_repo_path_layout.addWidget(self.local_repo_path_button)
+
+        frame = QFrame(self)
+        frame.setFrameShape(QFrame.HLine)
+        frame.setFrameShadow(QFrame.Sunken)
+        self.layout.addWidget(frame)
         self.layout.addWidget(self.install_button)
+        self.layout.addWidget(self.setup_master_button)
+        self.layout.addWidget(self.setup_slave_button)
 
         # deault values:
         self.documents_path = QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation)
@@ -100,28 +145,52 @@ class PandoraInstallerWidget(QWidget):
         # functionality
         self.load_path_button.clicked.connect(self.pick_maya_path)
         self.install_button.clicked.connect(self.install)
+        self.net_path_button.clicked.connect(self.pick_net_path)
+        self.local_repo_path_button.clicked.connect(self.pick_local_repo_path)
+        self.setup_slave_button.clicked.connect(self.setup_slave)
+        self.setup_master_button.clicked.connect(self.setup_master)
 
         # style
         self.resize(600, 100)
         self.setStyleSheet(qdarkstyle.load_stylesheet(pyside=True))
 
+    def load_config(self):
+        pass
+
+    def save_settings(self):
+        pass
+
+    def pick_local_repo_path(self):
+        print("picking local repo path")
+
+    def pick_net_path(self):
+        print("picking net path")
+
+    def setup_slave(self):
+        print("setting up slave")
+
+    def setup_master(self):
+        print("setting up master")
+
     def pick_maya_path(self):
+        self.documents_path = self.pick_path_for_field(self.maya_path_field)
+
+    def pick_path_for_field(self, field: QLineEdit):
         options = QFileDialog.Options()
         options |= QFileDialog.ShowDirsOnly | QFileDialog.DontUseNativeDialog
 
         directory = QFileDialog.getExistingDirectory(self, "Select Directory", options=options)
 
         if directory:
-            self.documents_path = directory
-            self.maya_path_field.setText(directory)
+            field.setText(directory)
+            return directory
+
+        return ""
 
     def install(self):
         exec_dir = os.path.dirname(os.path.abspath(__file__))
         project_dir = os.path.dirname(os.path.abspath(exec_dir))
         pandora_installer_dir = os.path.join(project_dir, "vendor\\Pandora")
-        os.chdir(pandora_installer_dir)
-        pandora_installer_name = "Pandora_Setup.bat"
-        pandora_installer_path = os.path.join(pandora_installer_dir, pandora_installer_name)
 
         dependency_dir = os.path.join(project_dir, "vendor\\PythonEnv")
         dependency_names = ['Python37', 'PythonLibs']
@@ -132,26 +201,43 @@ class PandoraInstallerWidget(QWidget):
             if not os.path.exists(destination):
                 shutil.copytree(dependency_path, destination)
 
-        # subprocess.run([pandora_installer_path], stdout=subprocess.PIPE, stderr=subprocess.PIPE)
-
         os.chdir(pandora_installer_dir)
         # init pandora core
         core = PandoraCore()
         self.installPandora(core)
         # setup maya integration
-        core_working_dir = os.path.join(pandora_installer_dir, 'Pandora\\Scripts')
-        os.chdir(core_working_dir)
+        self.setupMayaPlugins(core)
+        self.setupLocalPath(core)
+        self.setupRootPath(core)
 
+    def setupLocalPath(self, core: PandoraCore):
+        configureData = []
+
+        repPath = self.local_repo_path_field.text().replace("/", "\\")
+        if repPath != "" and not repPath.endswith("\\"):
+            repPath += "\\"
+        configureData.append(["globals", "repositoryPath", repPath])
+        core.setConfig(data=configureData)
+
+    def setupRootPath(self, core: PandoraCore):
+        configureData = []
+
+        rootPath = self.net_path_field.text().replace("/", "\\")
+        if rootPath != "" and not rootPath.endswith("\\"):
+            rootPath += "\\"
+        configureData.append(["globals", "rootPath", rootPath])
+        core.setConfig(data=configureData)
+
+    def setupMayaPlugins(self, core: PandoraCore):
         for i in core.unloadedAppPlugins:
             if i.pluginName == "Maya":
                 i.writeMayaFiles(self.maya_path)
 
-    # TODO: win32 load issue with quite install.
     def installPandora(self, core):
-        exec_dir = os.path.dirname(os.path.abspath(__file__))
-        project_dir = os.path.dirname(os.path.abspath(exec_dir))
-        installer_working_dir = os.path.join(project_dir, "vendor\\Pandora\\Pandora")
-        os.chdir(installer_working_dir)
+        # exec_dir = os.path.dirname(os.path.abspath(__file__))
+        # project_dir = os.path.dirname(os.path.abspath(exec_dir))
+        # installer_working_dir = os.path.join(project_dir, "vendor\\Pandora\\Pandora")
+        # os.chdir(installer_working_dir)
 
         from PandoraInstaller import PandoraInstaller
         installer = PandoraInstaller(core)
