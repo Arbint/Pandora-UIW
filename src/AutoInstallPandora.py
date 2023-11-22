@@ -44,6 +44,7 @@ def init_sys_path():
 
     # log out path info:
     # sys.stdout = open('output.log', 'w')
+    return
     print(f"src_dir: {src_dir}")
     print(f"root_dir: {root_dir}")
     print(f"dependency_path: {dependency_path}")
