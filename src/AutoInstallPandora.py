@@ -93,6 +93,7 @@ class PandoraInstallerWidget(QWidget):
         self.install_button = QPushButton("Install")
         self.setup_slave_button = QPushButton("Start Slave")
         self.open_settings_button = QPushButton("Pandora Settings")
+        self.turn_off_firewall_button = QPushButton("Turn Off Fire Wall")
         # layout
         self.layout = QVBoxLayout(self)
         frame = QFrame(self)
@@ -137,6 +138,7 @@ class PandoraInstallerWidget(QWidget):
         frame.setFrameShadow(QFrame.Sunken)
         self.layout.addWidget(frame)
         self.layout.addWidget(self.install_button)
+        self.layout.addWidget(self.turn_off_firewall_button)
         self.layout.addWidget(self.setup_slave_button)
         self.layout.addWidget(self.open_settings_button)
 
@@ -150,6 +152,7 @@ class PandoraInstallerWidget(QWidget):
         self.install_button.clicked.connect(self.install)
         self.net_path_button.clicked.connect(self.pick_net_path)
         self.local_repo_path_button.clicked.connect(self.pick_local_repo_path)
+        self.turn_off_firewall_button.clicked.connect(self.turn_off_fire_wall)
         self.setup_slave_button.clicked.connect(self.toggle_slave)
         self.open_settings_button.clicked.connect(self.open_pandora_settings)
 
@@ -159,6 +162,14 @@ class PandoraInstallerWidget(QWidget):
 
         self.config_file_name = "config.json"
         self.load_config()
+
+    def turn_off_fire_wall(self):
+        try:
+            import subprocess
+            subprocess.run(['netsh', 'advfirewall', 'set', 'currentprofile', 'state', 'off'], check=True)
+            print("Windows Firewall turned off successfully.")
+        except subprocess.CalledProcessError as e:
+            print(f"Error turning off Windows Firewall: {e}")
 
     def load_config(self):
         exec_dir = os.path.dirname(os.path.abspath(__file__))
@@ -276,6 +287,11 @@ class PandoraInstallerWidget(QWidget):
         installer = PandoraInstaller(core)
         installer.install()
 
+#run in admin
+import ctypes
+if not ctypes.windll.shell32.IsUserAnAdmin():
+    ctypes.windll.shell32.ShellExecuteW(None, "runas", sys.executable, " ".join(sys.argv), None, 1)
+    sys.exit()
 
 qApp = QApplication()
 qApp.setStyleSheet(qdarkstyle.load_stylesheet(pyside=True))
