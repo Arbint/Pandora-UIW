@@ -1,3 +1,0 @@
-[submodule "vendor/Pandora"]
-	path = vendor/Pandora
-	url = https://github.com/RichardFrangenberg/Pandora.git
