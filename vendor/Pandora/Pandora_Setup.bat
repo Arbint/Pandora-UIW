@@ -1,0 +1,2 @@
+Pandora/Setup_Integrations.bat
+Pandora/Setup_Startmenu.bat
