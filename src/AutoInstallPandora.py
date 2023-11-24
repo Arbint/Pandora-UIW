@@ -91,9 +91,10 @@ class PandoraInstallerWidget(QWidget):
         self.local_repo_path_button = QPushButton("...")
 
         self.install_button = QPushButton("Install")
+        self.turn_off_firewall_button = QPushButton("Turn Off Fire Wall")
         self.setup_slave_button = QPushButton("Start Slave")
         self.open_settings_button = QPushButton("Pandora Settings")
-        self.turn_off_firewall_button = QPushButton("Turn Off Fire Wall")
+        self.open_handler_button = QPushButton("Open Handler (Monitor)")
         # layout
         self.layout = QVBoxLayout(self)
         frame = QFrame(self)
@@ -141,6 +142,7 @@ class PandoraInstallerWidget(QWidget):
         self.layout.addWidget(self.turn_off_firewall_button)
         self.layout.addWidget(self.setup_slave_button)
         self.layout.addWidget(self.open_settings_button)
+        self.layout.addWidget(self.open_handler_button)
 
         # deault values:
         self.documents_path = QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation)
@@ -155,13 +157,22 @@ class PandoraInstallerWidget(QWidget):
         self.turn_off_firewall_button.clicked.connect(self.turn_off_fire_wall)
         self.setup_slave_button.clicked.connect(self.toggle_slave)
         self.open_settings_button.clicked.connect(self.open_pandora_settings)
-
+        self.open_handler_button.clicked.connect(self.open_pandora_handler)
         # style
         self.resize(600, 100)
         self.setStyleSheet(qdarkstyle.load_stylesheet(pyside=True))
 
         self.config_file_name = "config.json"
         self.load_config()
+
+    def open_pandora_handler(self):
+        exec_dir = os.path.dirname(os.path.abspath(__file__))
+        project_dir = os.path.dirname(os.path.abspath(exec_dir))
+        pandora_handler_path = os.path.join(project_dir, "vendor\\Pandora\\Pandora\\Python37\\Pandora Render Handler.exe")
+        pandora_handler_file_path = os.path.join(project_dir, "vendor\\Pandora\\Pandora\\Scripts\\PandoraRenderHandler.py")
+
+        import subprocess
+        subprocess.Popen([pandora_handler_path, pandora_handler_file_path])
 
     def turn_off_fire_wall(self):
         try:
