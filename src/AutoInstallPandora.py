@@ -95,6 +95,8 @@ class PandoraInstallerWidget(QWidget):
         self.setup_slave_button = QPushButton("Start Slave")
         self.open_settings_button = QPushButton("Pandora Settings")
         self.open_handler_button = QPushButton("Open Handler (Monitor)")
+        self.start_coordiantor_hint = QLabel("There should be only one coordiantor in a local area network\nif the handler runs ok, it means there is already a coordinator running in the system.\nonly click this button if handler do not show infomation\n")
+        self.start_coordinator_button = QPushButton("Start Coordinator")
         # layout
         self.layout = QVBoxLayout(self)
         frame = QFrame(self)
@@ -143,7 +145,8 @@ class PandoraInstallerWidget(QWidget):
         self.layout.addWidget(self.setup_slave_button)
         self.layout.addWidget(self.open_settings_button)
         self.layout.addWidget(self.open_handler_button)
-
+        self.layout.addWidget(self.start_coordiantor_hint)
+        self.layout.addWidget(self.start_coordinator_button)
         # deault values:
         self.documents_path = QStandardPaths.writableLocation(QStandardPaths.DocumentsLocation)
         self.maya_path = self.documents_path + "/maya/2024"
@@ -158,12 +161,21 @@ class PandoraInstallerWidget(QWidget):
         self.setup_slave_button.clicked.connect(self.toggle_slave)
         self.open_settings_button.clicked.connect(self.open_pandora_settings)
         self.open_handler_button.clicked.connect(self.open_pandora_handler)
+        self.start_coordinator_button.clicked.connect(self.open_coordinator)
         # style
         self.resize(600, 100)
         self.setStyleSheet(qdarkstyle.load_stylesheet(pyside=True))
 
         self.config_file_name = "config.json"
         self.load_config()
+    def open_coordinator(self):
+        exec_dir = os.path.dirname(os.path.abspath(__file__))
+        project_dir = os.path.dirname(os.path.abspath(exec_dir))
+        pandora_handler_path = os.path.join(project_dir, "vendor\\Pandora\\Pandora\\Python37\\Pandora Coordinator.exe")
+        pandora_handler_file_path = os.path.join(project_dir, "vendor\\Pandora\\Pandora\\Scripts\\PandoraCoordinator.py")
+
+        import subprocess
+        subprocess.Popen([pandora_handler_path, pandora_handler_file_path])
 
     def open_pandora_handler(self):
         exec_dir = os.path.dirname(os.path.abspath(__file__))
